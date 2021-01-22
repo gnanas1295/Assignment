@@ -1,0 +1,40 @@
+Assignment:
+
+1. DNS site failover using custom health/process check lambda script to monitor running process on instance(health check) and update route53 dns record if process goes down.
+
+Solution:
+
+1st half of the question:
+
+1) Create two public webservers(1 and 2) in two different regions (Region 1 and region 2) respectively
+2) Create a Route 53 Public hosted zone(e.g., medkonnect.org)
+3) Create two health checks for both the webservers
+4) Create a subdomain A record test.medkonnect.org(public webserver 1) and configure it as Failover routing(Primary)
+5) Create another same subdomain A record test.medkonnect.org(public webserver 2) and configure it as Failover routing(secondary)
+6) Test the connection by hitting http://test.medkonnect.org 
+7) Login to primary webserver 1 and stop httpd service
+8) After the TTL expires we will be able to see all the requests will be routed to the public webserver 2 if we try to hit the same URL
+
+2nd half of the question:
+
+1) Create a lambda along with required roles for accessing ec2 and Route 53.
+2) Use send-command API from Lambda function to get all the list of the process that are running(ps -aux for linux) / CPU utlization (mpstat here want to install sysstat)
+3) Based upon the response if the response is null update route 53 A type record to route the traffic to new server.
+
+
+2. Consider a monolithic java application stack. Apache Web Server, Apache Tomcat application server with redis, Active MQ ,Oracle and MongoDB backend. Propose a solution to migrate this application stack to AWS. Mention all the AWS services you would use and how you would maintain HA and Load Balancing (consider app to be stateless). Mention rationale for each design decision.
+
+Solution:
+
+1) Apache web server: Deploy two EC2 instances in two different AZ in the public sebnet behind Application load balancer as it will give us the response faster and less waittime. Application Load balancer since its best suited for routing http and https request and for request level.
+2) Apache Tomcat application server with redis: Deploy EC2 instances along with Auto scaling groups based upon the input from the ALB reponse and health checks using this we will have high availablity and uptime. And for redis we can use Elasticache as it's the fully managed in-memory data store and cache by AWS for cloud computing tasks and it seemlessly connects with all the AWS services.
+3) Active MQ: We can use Amazon SQS a message broker service from AWS for cloud compouting tasks. And it can transmit any volume of data at any level of throughput without losing messages. And the best part is its serverless and no maintainence is required. And Seamless connections with other AWS resources.
+4) Oracle DB: We can use AWS RDS is a fully managed relational database by AWS. And its designed for running the tasks in cloud infrastructure in a efficinet manner than oracle DB and as usual it works seamlessly in AWS. If greater availablity is required we can also use Aurora from AWS.
+5) Mongo DB: Best option would be DynamoDB which is a No-SQL Database service by AWS. And it uses tables, items and attributes whereas Mongo DB uses JSON formats. So, Dynamo would be easier to read and execute.
+
+
+3) Steps to control Cost of an organization infrastructure from AWS point of view.
+
+Solution: 
+
+Our design for the infra should be stateless and design should be pay when we use. Also, we can use the reports from Trusted advisor where it tells about the unutilised resources, AWS budgets to keep our bills low also AWS Cost explorer reports for finding what are the costs for each resources and Cloudwatch metrics of utilization factor of our resorces.
